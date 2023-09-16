@@ -16,6 +16,7 @@ use core::str::FromStr;
 #[allow(missing_docs)]
 pub enum Architecture {
     Unknown,
+    Art32,
     Arm(ArmArchitecture),
     AmdGcn,
     Aarch64(Aarch64Architecture),
@@ -820,6 +821,7 @@ impl Architecture {
 
         match self {
             Unknown => Err(()),
+            Art32 => Ok(Endianness::Little),
             Arm(arm) => Ok(arm.endianness()),
             Aarch64(aarch) => Ok(aarch.endianness()),
             AmdGcn
@@ -867,6 +869,7 @@ impl Architecture {
 
         match self {
             Unknown => Err(()),
+            Art32 => Ok(PointerWidth::U32),
             Avr | Msp430 => Ok(PointerWidth::U16),
             Arm(arm) => Ok(arm.pointer_width()),
             Aarch64(aarch) => Ok(aarch.pointer_width()),
@@ -912,6 +915,7 @@ impl Architecture {
         use Architecture::*;
 
         match self {
+            Art32 => Cow::Borrowed("art32"),
             Arm(arm) => arm.into_str(),
             Aarch64(aarch) => aarch.into_str(),
             Unknown => Cow::Borrowed("unknown"),
@@ -1196,6 +1200,7 @@ impl FromStr for Architecture {
 
         Ok(match s {
             "unknown" => Unknown,
+            "art32" => Art32,
             "amdgcn" => AmdGcn,
             "asmjs" => Asmjs,
             "avr" => Avr,
@@ -1491,6 +1496,7 @@ mod tests {
         //  - targets emitted by "rustc +nightly --print target-list"
         //  - targets contributors have added
         let targets = [
+            "art32-unknown-none",
             "aarch64-apple-darwin",
             "aarch64-apple-ios",
             "aarch64-apple-ios-macabi",
